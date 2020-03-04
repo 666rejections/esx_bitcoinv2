@@ -1,6 +1,8 @@
-resource_manifest_version '44febabe-d386-4d18-afbe-5e627f4af937'
+fx_version 'adamant'
 
-description 'ESX Bitcoin v2- By Jordan'
+game 'gta5'
+
+description 'ESX Bitcoin V2 - By Jordan'
 
 version '2.0.0'
 
