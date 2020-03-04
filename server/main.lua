@@ -175,13 +175,3 @@ AddEventHandler('esx_bitcoin:GetUserInventory', function(currentZone)
 		currentZone
 	)
 end)
-
-ESX.RegisterUsableItem('bitcoinitem', function(source)
-	local _source = source
-	local xPlayer = ESX.GetPlayerFromId(_source)
-
-	xPlayer.removeInventoryItem('bitcoinitem', 1)
-
-	TriggerClientEvent('esx_bitcoin:onPot', _source)
-	TriggerClientEvent('esx:showNotification', _source, _U('used_one_bitcoin'))
-end)
