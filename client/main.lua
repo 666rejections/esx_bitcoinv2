@@ -1,18 +1,6 @@
-local Keys = {
-	["ESC"] = 322, ["F1"] = 288, ["F2"] = 289, ["F3"] = 170, ["F5"] = 166, ["F6"] = 167, ["F7"] = 168, ["F8"] = 169, ["F9"] = 56, ["F10"] = 57,
-	["~"] = 243, ["1"] = 157, ["2"] = 158, ["3"] = 160, ["4"] = 164, ["5"] = 165, ["6"] = 159, ["7"] = 161, ["8"] = 162, ["9"] = 163, ["-"] = 84, ["="] = 83, ["BACKSPACE"] = 177,
-	["TAB"] = 37, ["Q"] = 44, ["W"] = 32, ["E"] = 38, ["R"] = 45, ["T"] = 245, ["Y"] = 246, ["U"] = 303, ["P"] = 199, ["["] = 39, ["]"] = 40, ["ENTER"] = 18,
-	["CAPS"] = 137, ["A"] = 34, ["S"] = 8, ["D"] = 9, ["F"] = 23, ["G"] = 47, ["H"] = 74, ["K"] = 311, ["L"] = 182,
-	["LEFTSHIFT"] = 21, ["Z"] = 20, ["X"] = 73, ["C"] = 26, ["V"] = 0, ["B"] = 29, ["N"] = 249, ["M"] = 244, [","] = 82, ["."] = 81,
-	["LEFTCTRL"] = 36, ["LEFTALT"] = 19, ["SPACE"] = 22, ["RIGHTCTRL"] = 70,
-	["HOME"] = 213, ["PAGEUP"] = 10, ["PAGEDOWN"] = 11, ["DELETE"] = 178,
-	["LEFT"] = 174, ["RIGHT"] = 175, ["TOP"] = 27, ["DOWN"] = 173,
-	["NENTER"] = 201, ["N4"] = 108, ["N5"] = 60, ["N6"] = 107, ["N+"] = 96, ["N-"] = 97, ["N7"] = 117, ["N8"] = 61, ["N9"] = 118
-}
-
-local kodaQTE       			= 0
+local bitcoinQTE       			= 0
 ESX 			    			= nil
-local koda_poochQTE 			= 0
+local bitcoin_poochQTE 			= 0
 local myJob 					= nil
 local HasAlreadyEnteredMarker   = false
 local LastZone                  = nil
@@ -33,21 +21,21 @@ AddEventHandler('esx_bitcoin:hasEnteredMarker', function(zone)
 	end
 
 	ESX.UI.Menu.CloseAll()
-	
+
 	if zone == 'BitCoin' then
-		CurrentAction     = zone
-		CurrentActionMsg  = _U('press_take_bitcoin')
+		CurrentAction = zone
+		CurrentActionMsg = _U('press_take_bitcoin')
 		CurrentActionData = {}
-	elseif zone == 'ProcessamentoDeVinho' then
-		if kodaQTE >= 5 then
-			CurrentAction     = zone
-			CurrentActionMsg  = _U('carrega_para_colocares_frutos_dentro_dos_sacos')
+	elseif zone == 'BitcoinProcessing' then
+		if bitcoinQTE >= 5 then
+			CurrentAction = zone
+			CurrentActionMsg = _U('carrega_para_colocares_frutos_dentro_dos_sacos')
 			CurrentActionData = {}
 		end
-	elseif zone == 'VendaDeBitcon' then
-		if koda_poochQTE >= 1 then
-			CurrentAction     = zone
-			CurrentActionMsg  = _U('press_sell_bitcoin')
+	elseif zone == 'BitcoinSale' then
+		if bitcoin_poochQTE >= 1 then
+			CurrentAction = zone
+			CurrentActionMsg = _U('press_sell_bitcoin')
 			CurrentActionData = {}
 		end
 	end
@@ -58,11 +46,11 @@ AddEventHandler('esx_bitcoin:hasExitedMarker', function(zone)
 	ESX.UI.Menu.CloseAll()
 
 	if zone == 'BitCoin' then
-		TriggerServerEvent('esx_bitcoin:stopHarvestKoda')
-	elseif zone == 'ProcessamentoDeVinho' then
-	TriggerServerEvent('esx_bitcoin:stopTransformKoda')
-	elseif zone == 'VendaDeBitcon' then
-		TriggerServerEvent('esx_bitcoin:stopSellKoda')
+		TriggerServerEvent('esx_bitcoin:stopHarvestBitcoin')
+	elseif zone == 'BitcoinProcessing' then
+	TriggerServerEvent('esx_bitcoin:stopTransformBitcoin')
+	elseif zone == 'BitcoinSale' then
+		TriggerServerEvent('esx_bitcoin:stopSellBitcoin')
 	end
 end)
 
@@ -76,15 +64,15 @@ Citizen.CreateThread(function()
 
 		for k,v in pairs(Config.Zones) do
 			if GetDistanceBetweenCoords(coords, v.x, v.y, v.z, true) < Config.DrawDistance then
-				DrawMarker(Config.MarkerType, v.x, v.y, v.z, 0.0, 0.0, 0.0, 0, 0.0, 0.0, Config.ZoneSize.x, Config.ZoneSize.y, Config.ZoneSize.z, Config.MarkerColor.r, Config.MarkerColor.g, Config.MarkerColor.b, 100, false, true, 2, false, false, false, false)
+				DrawMarker(Config.MarkerType, v.x, v.y, v.z, 0.0, 0.0, 0.0, -90.0, 0.0, 0.0, Config.ZoneSize.x, Config.ZoneSize.y, Config.ZoneSize.z, Config.MarkerColor.r, Config.MarkerColor.g, Config.MarkerColor.b, 100, false, true, 2, false, false, false, false)
 			end
 		end
 
 	end
 end)
 
+-- Blips
 if Config.ShowBlips then
-	-- Blip Map
 	Citizen.CreateThread(function()
 		for k,v in pairs(Config.Zones) do
 			local blip = AddBlipForCoord(v.x, v.y, v.z)
@@ -102,13 +90,12 @@ if Config.ShowBlips then
 	end)
 end
 
-
--- Item 
+-- Item
 RegisterNetEvent('esx_bitcoin:ReturnInventory')
-AddEventHandler('esx_bitcoin:ReturnInventory', function(kodaNbr, kodapNbr, jobName, currentZone)
-	kodaQTE			= kodaNbr
-	koda_poochQTE	= kodapNbr
-	myJob			= jobName
+AddEventHandler('esx_bitcoin:ReturnInventory', function(bitcoinNbr, bitcoinpNbr, jobName, currentZone)
+	bitcoinQTE = bitcoinNbr
+	bitcoin_poochQTE = bitcoinpNbr
+	myJob = jobName
 	TriggerEvent('esx_bitcoin:hasEnteredMarker', currentZone)
 end)
 
@@ -118,20 +105,20 @@ Citizen.CreateThread(function()
 
 		Citizen.Wait(0)
 
-		local coords      = GetEntityCoords(GetPlayerPed(-1))
-		local isInMarker  = false
+		local coords = GetEntityCoords(GetPlayerPed(-1))
+		local isInMarker = false
 		local currentZone = nil
 
 		for k,v in pairs(Config.Zones) do
 			if(GetDistanceBetweenCoords(coords, v.x, v.y, v.z, true) < Config.ZoneSize.x / 2) then
-				isInMarker  = true
+				isInMarker = true
 				currentZone = k
 			end
 		end
 
 		if isInMarker and not hasAlreadyEnteredMarker then
 			hasAlreadyEnteredMarker = true
-			lastZone				= currentZone
+			lastZone = currentZone
 			TriggerServerEvent('esx_bitcoin:GetUserInventory', currentZone)
 		end
 
@@ -149,15 +136,15 @@ Citizen.CreateThread(function()
 		if CurrentAction ~= nil then
 			ESX.ShowHelpNotification(CurrentActionMsg)
 
-			if IsControlJustReleased(0, Keys['E']) and IsPedOnFoot(PlayerPedId()) then
+			if IsControlJustReleased(0, 38) and IsPedOnFoot(PlayerPedId()) then
 				if CurrentAction == 'BitCoin' then
-					TriggerServerEvent('esx_bitcoin:startHarvestKoda')
-				elseif CurrentAction == 'ProcessamentoDeVinho' then
-					TriggerServerEvent('esx_bitcoin:startTransformKoda')
-				elseif CurrentAction == 'VendaDeBitcon' then
-					TriggerServerEvent('esx_bitcoin:startSellKoda')
+					TriggerServerEvent('esx_bitcoin:startHarvestBitcoin')
+				elseif CurrentAction == 'BitcoinProcessing' then
+					TriggerServerEvent('esx_bitcoin:startTransformBitcoin')
+				elseif CurrentAction == 'BitcoinSale' then
+					TriggerServerEvent('esx_bitcoin:startSellBitcoin')
 				end
-				
+
 				CurrentAction = nil
 			end
 		end
